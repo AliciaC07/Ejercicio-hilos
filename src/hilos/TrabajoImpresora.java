@@ -13,7 +13,6 @@ public class TrabajoImpresora implements Runnable {
     private List<Queue<Documento>> documentos;
     private ImpresoraCabeza impresoraCabeza;
 
-
     public TrabajoImpresora(List<Queue<Documento>> documentos, ImpresoraCabeza impresoraCabeza) {
         this.documentos = documentos;
         this.impresoraCabeza = impresoraCabeza;
@@ -22,6 +21,7 @@ public class TrabajoImpresora implements Runnable {
     @Override
     public void run() {
         while(!documentos.get(count).isEmpty()) {
+            System.out.println(count);
             impresoraCabeza.printJob(documentos.get(count).poll());
             count++;
         }
