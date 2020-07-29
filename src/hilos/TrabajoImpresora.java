@@ -5,28 +5,28 @@ import modelos.Documento;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TrabajoImpresora implements Runnable {
+  private Queue<Documento> documentos;
+  private ImpresoraCabeza impresoraCabeza;
+  private String tipo;
+  private final Lock colaLock = new ReentrantLock();
 
-    public Integer count = 0;
+  public TrabajoImpresora(Queue<Documento> documentos, ImpresoraCabeza impresoraCabeza, String tipo) {
+    this.documentos = documentos;
+    this.impresoraCabeza = impresoraCabeza;
+    this.tipo = tipo;
+  }
 
-    private List<Queue<Documento>> documentos;
-    private ImpresoraCabeza impresoraCabeza;
-
-    public TrabajoImpresora(List<Queue<Documento>> documentos, ImpresoraCabeza impresoraCabeza) {
-        this.documentos = documentos;
-        this.impresoraCabeza = impresoraCabeza;
-    }
-
-    @Override
-    public void run() {
-        while(!documentos.get(count).isEmpty()) {
-            System.out.println(count);
-            impresoraCabeza.printJob(documentos.get(count).poll());
-            count++;
-        }
-        System.out.printf("%s: A imprimir un documento\n", Thread.currentThread().getName());
-
-
-    }
+  @Override
+  public void run() {
+    while (!documentos.isEmpty())
+      if (documentos.peek().getTipo().equals(tipo)) {
+        colaLock.lock();
+        impresoraCabeza.printJob(documentos.poll());
+        colaLock.unlock();
+      }
+  }
 }
